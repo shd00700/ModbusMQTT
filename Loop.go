@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	mbc"github.com/shd00700/ModbusMQTT"
 	//"time"
 	//"time"
 	//"reflect"
@@ -19,7 +20,7 @@ func Loop() {
 	var leng uint16
 
 	//TCP coonnetion
-	
+
 	/*err := mbc.Open()
 	if err != nil {
 		log.Println("disconnect",err)
