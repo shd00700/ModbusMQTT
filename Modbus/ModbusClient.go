@@ -37,7 +37,7 @@ type MBClient struct {
 //state show for error
 // NewClient creates a new Modbus Client config.
 func NewClient(IP string, port int, timeout time.Duration) *MBClient {
-	print("클라이언트")
+	print("Client Open")
 	m := &MBClient{}
 	m.IP = IP
 	m.Port = port
