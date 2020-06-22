@@ -3,16 +3,18 @@ package ModbusMQTT
 import (
 	"bufio"
 	"fmt"
-	mbc "github.com/shd00700/ModbusMQTT/Modbus"
+	MQTT "github.com/shd00700/ModbusMQTT/MQTT"
+	MbcMq "github.com/shd00700/ModbusMQTT/Modbus"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-	//"time"
+	"time"
 	//"time"
 	//"reflect"
 	//"strings"
 )
+
 func Loop() {
 	//var arr []string
 	var num int
@@ -20,10 +22,15 @@ func Loop() {
 	var leng uint16
 
 
+	//TCP coonnetion
+	mbc := MbcMq.NewClient("192.168.0.222", 502, time.Second)
+	mbc.Open()
+
 
 	/*err := mbc.Open()
 	if err != nil {
 		log.Println("disconnect",err)
+
 	}*/
 
 	defer mbc.Close()
@@ -34,7 +41,7 @@ func Loop() {
 	input := bufio.NewScanner(os.Stdin)
 Main:
 	for {
-		Scrclr()
+		MbcMq.Scrclr()
 		println("-------------------------------------")
 		fmt.Println("Main Menu")
 		println("-------------------------------------")
@@ -45,7 +52,7 @@ Main:
 		if num == 1{
 		OutputCoils:
 			for {
-				Scrclr()
+				MbcMq.Scrclr()
 				println("-------------------------------------")
 				fmt.Println("Output Coils")
 				println("-------------------------------------")
@@ -55,7 +62,7 @@ Main:
 
 				if num == 1{
 
-					Scrclr()
+					MbcMq.Scrclr()
 					var arr []string
 					var leng int
 
@@ -69,11 +76,11 @@ Main:
 
 					fmt.Print("Enter data values: ")
 					input.Scan()
-					err, _ := strconv.Atoi(input.Text())
 					arr = strings.Split(input.Text(), " ")
+					err, _ := strconv.Atoi(input.Text())
 					if err == 1 || err == 0  && leng == len(arr) && add < 11{
 						mbc.WriteCoils(1, add, arr)
-						Continue()
+						MbcMq.Continue()
 						fmt.Scanln(&num)
 						if num == 1 {
 							continue OutputCoils
@@ -81,8 +88,8 @@ Main:
 							continue Main
 						}
 					} else {
-						Scrclr()
-						Error()
+						MbcMq.Scrclr()
+						MbcMq.Error()
 						fmt.Scanln(&num)
 						if num == 1{
 							continue OutputCoils
@@ -92,7 +99,7 @@ Main:
 					}
 				}
 				if num == 2{
-					Scrclr()
+					MbcMq.Scrclr()
 					println("-------------------------------------")
 					fmt.Println("Read Coils")
 					println("-------------------------------------")
@@ -101,9 +108,20 @@ Main:
 					fmt.Print("length values:")
 					fmt.Scanln(&leng)
 
+					if leng > 10{
+						MQTT.ErrPublish()
+						MbcMq.Scrclr()
+						MbcMq.Error()
+						fmt.Scanln(&num)
+						if num == 1{
+							continue OutputCoils
+						}else if num == 2{
+							continue Main
+						}
+					}
 					data, _ := mbc.ReadCoil(1, add, leng)
 					fmt.Println("Data values : ", data)
-					Continue()
+					MbcMq.Continue()
 					fmt.Scanln(&num)
 					if num == 1 {
 						continue OutputCoils
@@ -122,7 +140,7 @@ Main:
 		if num == 2{
 		InputCoils:
 			for {
-				Scrclr()
+				MbcMq.Scrclr()
 				println("-------------------------------------")
 				fmt.Println("Input Coils")
 				println("-------------------------------------")
@@ -131,9 +149,20 @@ Main:
 				fmt.Print("length values:")
 				fmt.Scanln(&leng)
 
+				if leng > 10 || add > 10{
+					MbcMq.Scrclr()
+					MbcMq.Error()
+					fmt.Scanln(&num)
+					if num == 1{
+						continue InputCoils
+					}else if num == 2{
+						continue Main
+					}
+				}
+
 				data, _ := mbc.ReadCoilIn(1, add, leng)
 				fmt.Println("Data value:",data)
-				Continue()
+				MbcMq.Continue()
 				fmt.Scanln(&num)
 				if num == 1 {
 					continue InputCoils
@@ -145,7 +174,7 @@ Main:
 		if num == 3{
 		InputRegisters:
 			for {
-				Scrclr()
+				MbcMq.Scrclr()
 				println("-------------------------------------")
 				fmt.Println("Input Registers")
 				println("-------------------------------------")
@@ -153,9 +182,22 @@ Main:
 				fmt.Scanln(&add)
 				fmt.Print("length values:")
 				fmt.Scanln(&leng)
+
+				if leng > 10 || add > 10{
+					MQTT.ErrPublish()
+					MbcMq.Scrclr()
+					MbcMq.Error()
+					fmt.Scanln(&num)
+					if num == 1{
+						continue InputRegisters
+					}else if num == 2{
+						continue Main
+					}
+				}
+
 				data, _ := mbc.ReadRegIn(1, add, leng)
 				fmt.Println("Data values : ",data)
-				Continue()
+				MbcMq.Continue()
 				fmt.Scanln(&num)
 				if num == 1 {
 					continue InputRegisters
@@ -169,7 +211,7 @@ Main:
 		HoldingRegisters:
 			for {
 
-				Scrclr()
+				MbcMq.Scrclr()
 				println("-------------------------------------")
 				fmt.Println("Holding Registers")
 				println("-------------------------------------")
@@ -177,7 +219,7 @@ Main:
 				fmt.Print("Select number Enter:")
 				fmt.Scanln(&num)
 				if num == 1 {
-					Scrclr()
+					MbcMq.Scrclr()
 					var arr []string
 					var leng int
 					println("-------------------------------------")
@@ -192,9 +234,10 @@ Main:
 					err, _ := strconv.Atoi(input.Text())
 
 					if err > 65535 {
-						Scrclr()
+						MQTT.ErrPublish()
+						MbcMq.Scrclr()
 						fmt.Println("\n[Max Excess error]")
-						Error()
+						MbcMq.Error()
 						fmt.Scanln(&num)
 						if num == 1{
 							continue HoldingRegisters
@@ -206,7 +249,7 @@ Main:
 					//bbb := strconv.Itoa(leng)
 					if leng == len(arr){
 						mbc.WriteRegs(1, add, arr)
-						Continue()
+						MbcMq.Continue()
 						fmt.Scanln(&num)
 						if num == 1 {
 							continue HoldingRegisters
@@ -214,9 +257,10 @@ Main:
 							continue Main
 						}
 					}else{
-						Scrclr()
+						MQTT.ErrPublish()
+						MbcMq.Scrclr()
 						fmt.Println("\n[Entered incorrectly length values]")
-						Error()
+						MbcMq.Error()
 						fmt.Scanln(&num)
 						if num == 1{
 							continue HoldingRegisters
@@ -227,7 +271,7 @@ Main:
 
 				}
 				if num == 2{
-					Scrclr()
+					MbcMq.Scrclr()
 					println("-------------------------------------")
 					fmt.Println("Read Registers")
 					println("-------------------------------------")
@@ -235,9 +279,20 @@ Main:
 					fmt.Scanln(&add)
 					fmt.Print("length values:")
 					fmt.Scanln(&leng)
+					if leng > 10 || add > 10{
+						MQTT.ErrPublish()
+						MbcMq.Scrclr()
+						MbcMq.Error()
+						fmt.Scanln(&num)
+						if num == 1{
+							continue HoldingRegisters
+						}else if num == 2{
+							continue Main
+						}
+					}
 					data, _ := mbc.ReadReg(0, add, leng)
 					fmt.Println("Data values : ",data)
-					Continue()
+					MbcMq.Continue()
 					fmt.Scanln(&num)
 					if num == 1 {
 						continue HoldingRegisters
