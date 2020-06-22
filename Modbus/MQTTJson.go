@@ -6,6 +6,8 @@ import(
 	
 	)
 
+var opts = MQTT.NewClientOptions().AddBroker("tcp://broker.hivemq.com:1883")
+
 type ReadCoil struct {
 	FunctionCode string
 	StartAdd uint16
