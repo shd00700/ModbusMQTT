@@ -23,8 +23,6 @@ func Loop() {
 
 
 	//TCP coonnetion
-	mbc := MbcMq.NewClient("192.168.0.222", 502, time.Second)
-	mbc.Open()
 
 
 	/*err := mbc.Open()
