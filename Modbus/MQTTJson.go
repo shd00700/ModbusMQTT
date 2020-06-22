@@ -1,5 +1,11 @@
 package ModbusMQTT
 
+import(
+	"encoding/json"
+	MQTT "github.com/eclipse/paho.mqtt.golang"
+	
+	)
+
 type ReadCoil struct {
 	FunctionCode string
 	StartAdd uint16
