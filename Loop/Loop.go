@@ -23,7 +23,7 @@ func Loop() {
 
 
 	//TCP coonnetion
-	mbc := ModbusMQTT.NewClient("192.168.0.222", 502, time.Second)
+	mbc := MbcMq.NewClient("192.168.0.222", 502, time.Second)
 	mbc.Open()
 
 	/*err := mbc.Open()
