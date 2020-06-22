@@ -2,7 +2,7 @@ package ModbusMQTT
 
 import(
 	"fmt"
-	mbcmq "github.com/shd00700/ModbusMQTT/Modbus"
+	MQTT "github.com/shd00700/ModbusMQTT/MQTT"
 	"net"
 	"os"
 	"os/exec"
@@ -130,7 +130,7 @@ func (m *MBClient) ReadCoil(id uint8, addr uint16, leng uint16) ([]int, error) {
 		}
 	}
 
-	mbcmq.ReadCoilPublish(0,true,addr,Result)
+	MQTT.ReadCoilPublish(0,true,addr,Result)
 	Result = Result[:leng]
 	return Result, nil
 }
@@ -163,7 +163,7 @@ func (m *MBClient) ReadCoilIn(id uint8, addr uint16, leng uint16) ([]int, error)
 			}
 		}
 	}
-	mbcmq.ReadCoilInPublish(0,true,addr,result)
+	MQTT.ReadCoilInPublish(0,true,addr,result)
 	result = result[:leng]
 
 	return result, nil
@@ -194,7 +194,7 @@ func (m *MBClient) ReadReg(id uint8, addr uint16, leng uint16) ([]uint16, error)
 		result = append(result,b)
 		addr++
 	}
-	mbcmq.ReadRegPublish(0,true,addr,result)
+	MQTT.ReadRegPublish(0,true,addr,result)
 	return result, nil
 }
 
@@ -222,7 +222,7 @@ func (m *MBClient) ReadRegIn(id uint8, addr uint16, leng uint16) ([]uint16, erro
 		b |= uint16(res[i*2+4])
 		result = append(result, b)
 	}
-	mbcmq.ReadRegInPublish(0,true,addr,result)
+	MQTT.ReadRegInPublish(0,true,addr,result)
 	return result, nil
 }
 
@@ -270,7 +270,7 @@ func (m *MBClient) WriteReg(id uint8, addr uint16, data uint16) error {
 
 //WriteCoils mdbus function 15(0x0f) qurry and return []uint16
 func (m *MBClient) WriteCoils(id uint8, addr uint16, data []string) error {
-	mbcmq.WriteCoilsPublish(0,true,addr,data)
+	MQTT.WriteCoilsPublish(0,true,addr,data)
 	pdu := []byte{}
 	if len(data)%8 == 0 {
 		pdu = []byte{id, 0x0f, byte(addr >> 8), byte(addr), byte(len(data) >> 8), byte(len(data)), byte(len(data) / 8)}
@@ -308,7 +308,7 @@ func (m *MBClient) WriteCoils(id uint8, addr uint16, data []string) error {
 
 
 func (m *MBClient) WriteRegs(id uint8, addr uint16, data []string)  error {
-	mbcmq.WriteRegsPublish(0,true,addr,data)
+	MQTT.WriteRegsPublish(0,true,addr,data)
 	//var data []byte
 	pdu := []byte{id, 0x10, byte(addr >> 8), byte(addr), byte(len(data) >> 8), byte(len(data)), byte(len(data)) * 2}
 	for i := 0; i < len(data); i++ {
