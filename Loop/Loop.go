@@ -31,8 +31,6 @@ func Loop() {
 
 	}*/
 
-	defer mbc.Close()
-
 	data, _ := mbc.ReadReg(1, 0, 10)
 	log.Println(data)
 
