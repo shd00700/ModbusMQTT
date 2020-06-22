@@ -15,7 +15,7 @@ import (
 	//"strings"
 )
 
-func Loop() {
+func Loop(wg *sync.WaitGroup) {
 	//var arr []string
 	var num int
 	var add uint16
