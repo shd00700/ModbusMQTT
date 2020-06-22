@@ -3,7 +3,6 @@ package ModbusMQTT
 import(
 	"encoding/json"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-
 )
 
 var opts = MQTT.NewClientOptions().AddBroker("tcp://broker.hivemq.com:1883")
@@ -11,7 +10,12 @@ var opts = MQTT.NewClientOptions().AddBroker("tcp://broker.hivemq.com:1883")
 type ReadCoil struct {
 	FunctionCode string
 	StartAdd uint16
-	AnalogState []int
+	DigitalState []int
+}
+type WriteCoils struct {
+	FunctionCode string
+	StartAdd uint16
+	DigitalState []string
 }
 
 type ReadReg struct {
@@ -86,8 +90,22 @@ func ReadRegInPublish(q byte,r bool,a uint16,b []uint16){
 	token := c.Publish("test/topic12/1",q,r,p); token.Wait()
 }
 
+func WriteCoilsPublish(q byte,r bool,a uint16,b []string){
+	j := WriteCoils{"WriteCoils", a,b}
+	p, err := json.Marshal(j)
+	if err!=nil{
+		panic(err)
+	}
+
+	c := MQTT.NewClient(opts)
+	if token := c.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+	token := c.Publish("test/topic12/1",q,r,p); token.Wait()
+}
+
 func WriteRegsPublish(q byte,r bool,a uint16,b []string){
-	j := WriteRegs{"ReadInputRegister", a,b}
+	j := WriteRegs{"WriteRegisters", a,b}
 	p, err := json.Marshal(j)
 	if err!=nil{
 		panic(err)
