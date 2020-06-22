@@ -87,6 +87,7 @@ Main:
 							continue Main
 						}
 					} else {
+						MQTT.ErrPublish()
 						MbcMq.Scrclr()
 						MbcMq.Error()
 						fmt.Scanln(&num)
@@ -149,6 +150,7 @@ Main:
 				fmt.Scanln(&leng)
 
 				if leng > 10 || add > 10{
+					MQTT.ErrPublish()
 					MbcMq.Scrclr()
 					MbcMq.Error()
 					fmt.Scanln(&num)
