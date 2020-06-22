@@ -13,7 +13,7 @@ import(
 	//"strings"
 )
 func Scrclr(){
-	cmd := exec.Command("cmd", "/c", "cls")
+	cmd := exec.Command("clear")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 }
