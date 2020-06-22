@@ -31,7 +31,7 @@ func ReadCoilPublish(q byte,r bool,a uint16,b []int){
 	token := c.Publish("test/topic12/1",q,r,p); token.Wait()
 }
 
-func errPublish(){
+func ErrPublish(){
 	j := ErrJson{"You entered it iolncorrectly.Return to the Output Coils menu."}
 	p, err := json.Marshal(j)
 	if err!=nil{
