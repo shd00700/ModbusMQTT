@@ -119,7 +119,7 @@ func (m *MBClient) ReadCoil(id uint8, addr uint16, leng uint16) ([]int, error) {
 	}
 	//convert
 	Result := []int{}
-	bc := res[2]
+	bc := res[1]
 	for i := 0; i < int(bc); i++ {
 		for j := 0; j <int(leng); j++ {
 			if (res[3+i] & (byte(1) << byte(j))) != 0 {
@@ -153,7 +153,7 @@ func (m *MBClient) ReadCoilIn(id uint8, addr uint16, leng uint16) ([]int, error)
 
 	//convert
 	result := []int{}
-	bc := res[2]
+	bc := res[1]
 	for i := 0; i < int(bc); i++ {
 		for j := 0; j < int(leng); j++ {
 			if (res[3+i] & (byte(1) << byte(j))) != 0 {
