@@ -2,21 +2,13 @@ package ModbusMQTT
 
 import(
 	"fmt"
-	MQTT "github.com/shd00700/ModbusMQTT/MQTT"
 	"net"
-	"os"
-	"os/exec"
 	"strconv"
 	"time"
 	//"time"
 	//"reflect"
 	//"strings"
 )
-func Scrclr(){
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
 
 const (
 	Init        = "Init"
@@ -59,11 +51,9 @@ func (m *MBClient) Open() error {
 }
 //Close modbus tcp connetion
 func (m *MBClient) Close() {
-	print("ㅎㅎ")
 	//os.Exit(12)
 	//print("gg")
 	if m.Conn != nil {
-		print("gg")
 		m.Conn.Close()
 	}
 }
@@ -119,6 +109,9 @@ func (m *MBClient) ReadCoil(id uint8, addr uint16, leng uint16) ([]int, error) {
 	}
 	//convert
 	Result := []int{}
+
+	var cnt int
+	cnt = 0
 	bc := res[1]
 	for i := 0; i < int(bc); i++ {
 		for j := 0; j <int(leng); j++ {
@@ -127,10 +120,10 @@ func (m *MBClient) ReadCoil(id uint8, addr uint16, leng uint16) ([]int, error) {
 			} else {
 				Result = append(Result, 0)
 			}
+			cnt++
+			println(cnt)
 		}
 	}
-
-	MQTT.ReadCoilPublish(0,true,addr,Result)
 	Result = Result[:leng]
 	return Result, nil
 }
@@ -163,7 +156,6 @@ func (m *MBClient) ReadCoilIn(id uint8, addr uint16, leng uint16) ([]int, error)
 			}
 		}
 	}
-	MQTT.ReadCoilInPublish(0,true,addr,result)
 	result = result[:leng]
 
 	return result, nil
@@ -192,9 +184,7 @@ func (m *MBClient) ReadReg(id uint8, addr uint16, leng uint16) ([]uint16, error)
 		b = uint16(res[i*2+3]) << 8
 		b |= uint16(res[i*2+4])
 		result = append(result,b)
-		addr++
 	}
-	MQTT.ReadRegPublish(0,true,addr,result)
 	return result, nil
 }
 
@@ -222,7 +212,6 @@ func (m *MBClient) ReadRegIn(id uint8, addr uint16, leng uint16) ([]uint16, erro
 		b |= uint16(res[i*2+4])
 		result = append(result, b)
 	}
-	MQTT.ReadRegInPublish(0,true,addr,result)
 	return result, nil
 }
 
@@ -270,7 +259,6 @@ func (m *MBClient) WriteReg(id uint8, addr uint16, data uint16) error {
 
 //WriteCoils mdbus function 15(0x0f) qurry and return []uint16
 func (m *MBClient) WriteCoils(id uint8, addr uint16, data []string) error {
-	MQTT.WriteCoilsPublish(0,true,addr,data)
 	pdu := []byte{}
 	if len(data)%8 == 0 {
 		pdu = []byte{id, 0x0f, byte(addr >> 8), byte(addr), byte(len(data) >> 8), byte(len(data)), byte(len(data) / 8)}
@@ -308,11 +296,9 @@ func (m *MBClient) WriteCoils(id uint8, addr uint16, data []string) error {
 
 
 func (m *MBClient) WriteRegs(id uint8, addr uint16, data []string)  error {
-	MQTT.WriteRegsPublish(0,true,addr,data)
 	//var data []byte
 	pdu := []byte{id, 0x10, byte(addr >> 8), byte(addr), byte(len(data) >> 8), byte(len(data)), byte(len(data)) * 2}
 	for i := 0; i < len(data); i++ {
-
 		pi, _ := strconv.ParseUint(data[i], 10, 16)
 		//fmt.Println("alias  ",addr, ": ", pi)
 		pdu = append(pdu, byte(pi>>8))
@@ -332,21 +318,4 @@ func (m *MBClient) WriteRegs(id uint8, addr uint16, data []string)  error {
 		return err
 	}
 	return nil
-}
-
-
-func Error(){
-	println("-------------------------------------")
-	fmt.Println("error")
-	println("-------------------------------------")
-	fmt.Println("You entered it iolncorrectly.\nReturn to the Output Coils menu.")
-	println("-------------------------------------\n\n\n")
-	fmt.Print("1 : Back\n","2 : Main menu\n\n\n")
-	fmt.Print("Select number Enter:")
-}
-func Continue(){
-	println("\n\n\n-------------------------------------")
-	fmt.Println("1 : Back","\n2 : Main menu")
-	println("-------------------------------------\n\n\n")
-	fmt.Print("Select number Enter:")
 }
