@@ -1,16 +1,14 @@
 package ModbusMQTT
 
 import (
-	"fmt"
 	"log"
-	"net/url"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func connect(clientId string, uri *url.URL) mqtt.Client {
-	opts := createClientOptions(clientId, uri)
+func connect(clientId string,url string) mqtt.Client {
+	opts := createClientOptions(clientId,url)
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
 	for !token.WaitTimeout(3 * time.Second) {
@@ -21,19 +19,16 @@ func connect(clientId string, uri *url.URL) mqtt.Client {
 	return client
 }
 
-func createClientOptions(clientId string, uri *url.URL,add string) *mqtt.ClientOptions {
+func createClientOptions(clientId string,url string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(add)
-	opts.SetUsername(uri.User.Username())
-	password, _ := uri.User.Password()
-	opts.SetPassword(password)
-	opts.SetClientID(clientId)
+	opts.AddBroker(url)
 	return opts
 }
 
-func listen(uri *url.URL, topic string) {
-	client := connect("sub", uri)
+/*func listen(topic string) {
+	client := connect("sub","tcp://broker.hivemq.com:1883")
 	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
 	})
-}
+}*/
+
