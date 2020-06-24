@@ -32,3 +32,10 @@ func createClientOptions(clientId string,url string) *mqtt.ClientOptions {
 	})
 }*/
 
+func MQPublish(topic string,qos byte,retained bool){
+	client := connect("pub","tcp://broker.hivemq.com:1883")
+	timer := time.NewTicker(1 * time.Second)
+	for t := range timer.C {
+		client.Publish(topic, qos, retained, t.String())
+	}
+}
