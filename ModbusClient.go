@@ -1,4 +1,4 @@
-package Library
+package ModbusMQTT
 
 import (
 	"fmt"
